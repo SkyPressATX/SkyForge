@@ -1,0 +1,25 @@
+{
+    "name": "skypress/sky-forge",
+    "description": "SkyForge is a template based WordPress theme created by SkyPress.",
+    "type": "wordpress-theme",
+    "require": {
+        "composer/installers": "^1.6",
+        "mustache/mustache": "^2.12"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7.3"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ben Moore",
+            "email": "bmo@skypress.io"
+        }
+    ],
+    "minimum-stability": "alpha",
+    "autoload": {
+      "psr-4": {
+        "SkyForge\\":"src/"
+      }
+    }
+}
