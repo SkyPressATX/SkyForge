@@ -4,35 +4,9 @@ COMPOSER_IMAGE := skypress/wp-composer
 default: lint
 
 lint: lint-php
-clean: file-perms wp-clean
+clean: file-perms
 install: composer-install
 update: composer-update
-start: local-start file-perms wp-clean
-stop: local-stop
-refresh: local-refresh file-perms wp-clean
-restart: stop start
-
-local-start:
-	@echo
-	# Start with docker-compose
-	docker-compose start
-	@echo
-	# Started
-
-local-stop:
-	@echo
-	# Stop with docker-compose
-	docker-compose stop
-	@echo
-	# Stopped
-
-local-refresh:
-	@echo
-	# Refresh the site
-	docker-compose down
-	docker-compose up -d
-	@echo
-	# Site refreshed
 
 lint-php:
 		@echo
@@ -76,13 +50,3 @@ composer-update:
 		$(COMPOSER_IMAGE):latest composer update -o
 	@echo
 	# Finished install packages
-
-wp-clean:
-	@echo
-	# Clean up un-wanted mess from vanilla WP
-	rm -rf wp-content/themes/twentyfifteen
-	rm -rf wp-content/themes/twentysixteen
-	rm -rf wp-content/plugins/akismet
-	rm -f wp-content/plugins/hello.php
-	@echo
-	# All clean
