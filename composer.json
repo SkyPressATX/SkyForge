@@ -1,5 +1,5 @@
 {
-    "name": "skypress/sky-forge",
+    "name": "skypress/skyforge",
     "description": "SkyForge is a template based WordPress theme created by SkyPress.",
     "type": "wordpress-theme",
     "require": {
