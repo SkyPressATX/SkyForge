@@ -41,11 +41,8 @@ lint-php:
 			--volume $(PWD):/workspace \
 			--workdir /workspace \
 			$(PHP_IMAGE):7.2 \
-				/bin/bash -c 'find ./*/plugins ./*/themes \
+				/bin/bash -c 'find . \
 					-not \( -path "*/vendor" -prune \) \
-					-not \( -path "./wp-admin" -prune \) \
-					-not \( -path "./wp-includes" -prune \) \
-					-not \( -path "*twenty*" -prune \) \
 					-name \*.php \
 					-print0 | \
 					xargs -I {} -0 php -l {}'
