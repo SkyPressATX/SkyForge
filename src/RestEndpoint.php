@@ -40,14 +40,33 @@ class RestEndpoint
     /**
      * Get and Endpoint based on provided slug
      *
-     * @param String $slug
+     * @param Int $id
+     * @param String $type
      *
      * @return String
      * @throws \Exception
      */
-    public function getEndpoint(string $slug) : string
+    public function getEndpoint(int $id = null, string $type) : string
     {
-        echo "----------- BMO $slug : {$this->permalink} ------------------\n";
-        return "{$this->api_namespace}/posts";
+        $type = $this->getRestBase($type);
+        $endpoint = "{$this->api_namespace}/{$type}";
+        if (null !== $id || (int)0 !== $id) {
+            $endpoint .= "/$id";
+        }
+
+        return $endpoint;
+    }
+
+    /**
+     * Get Rest API Base slug
+     *
+     * @param String $type
+     *
+     * @return String
+     */
+    public function getRestBase(string $type) : string
+    {
+        $type_object = get_post_type_object($type);
+        return (empty((array)$type_object) || ! property_exists($type_object, 'rest_base')) ? $type : strtolower($type_object->rest_base);
     }
 }

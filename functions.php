@@ -5,7 +5,7 @@ if (! defined('ABSPATH')) {
 }
 
 /**
- * Functions for SkyStache Theme
+ * Functions for SkyForge Theme
  */
 
 /**
@@ -13,7 +13,7 @@ if (! defined('ABSPATH')) {
  *
  * @return String
  */
-function requireComposerAutoloader()
+function skyforgeRequireComposerAutoloader()
 {
     if (file_exists(ABSPATH . "/wp-content/vendor/autoload.php")) {
         require_once ABSPATH . "/wp-content/vendor/autoload.php";
@@ -26,4 +26,19 @@ function requireComposerAutoloader()
     }
 }
 // Require Composer Autoloader
-requireComposerAutoloader();
+skyforgeRequireComposerAutoloader();
+
+/**
+ * Enqueue Stylesheets
+ *
+ */
+function skyforgeEnqueueStylesheets()
+{
+    // Parent
+    wp_enqueue_style('skyforge-style', get_template_directory_uri() . '/style.css');
+    // Child
+    if (file_exists(get_stylesheet_directory() . '/style.css')) {
+        wp_enqueue_style('child-style', get_stylesheet_directory_uri() . '/style.css');
+    }
+}
+add_action('wp_enqueue_scripts', 'skyforgeEnqueueStylesheets');
