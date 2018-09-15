@@ -9,18 +9,39 @@ namespace SkyForge;
 class Init
 {
     /**
+     * @var $post_id
+     */
+    public $post_id;
+
+    /**
      * Render Method
-     *
-     * @param String $slug
      *
      * @return String
      * @throws \Exception
      */
-    public function render(string $slug) : string
+    public function render() : string
     {
-        $request_data = $this->getRequestDataFromSlug($slug);
-        var_dump($request_data);
+        $this->post_id = $this->getPostID();
+        echo "POST ID: {$this->post_id}\n";
+        // $request_data = $this->getRequestDataFromSlug($slug);
+        // var_dump($request_data);
         return '<h1>Hello SkyStache</h1>';
+    }
+
+    /**
+     * Get Post ID
+     *
+     * @see https://codex.wordpress.org/Function_Reference/url_to_postid
+     *
+     * @return Int
+     * @throws \Exception
+     */
+    public function getPostID() : int
+    {
+        global $wp;
+        $request_url = add_home(add_query_arg(array(), $wp->request));
+        $post_id = url_to_postid($request_url);
+        return $post_id;
     }
 
     /**
