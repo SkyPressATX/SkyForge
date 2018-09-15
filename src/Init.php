@@ -39,7 +39,7 @@ class Init
     public function getPostID() : int
     {
         global $wp;
-        $request_url = add_home(add_query_arg(array(), $wp->request));
+        $request_url = home_url(add_query_arg(array(), $wp->request));
         $post_id = url_to_postid($request_url);
         return $post_id;
     }
