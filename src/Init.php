@@ -2,66 +2,141 @@
 namespace SkyForge;
 
 /**
- * Init Class
+ * SkyForge Initialize Class
  *
- * @TODO Break up this big class into smaller ones
+ * @since 0.1.0
+ *
+ * @var \SkyForge\Mustache $mustache
+ * @var int $post_id
+ * @var array $template_map
  */
 class Init
 {
     /**
-     * @var $post_id
+     * Mustache Instance
+     *
+     * @since 0.1.0
+     *
+     * @var \SkyForge\Mustache
+     */
+    public $mustache;
+
+    /**
+     * Post ID
+     *
+     * @since 0.1.0
+     *
+     * @var int
      */
     public $post_id;
 
     /**
-     * @var $template_dir
+     * Template Map
+     *
+     * @since 0.1.0
+     *
+     * @var array
      */
-    public $template_dir;
+    public $template_map;
 
     /**
-     * Render Method
+     * Init constructor
      *
-     * @return String
-     * @throws \Exception
+     * @method __construct
+     *
+     * @since 0.1.0
+     *
      */
-    public function render(string $template_dir = null) : string
+    public function __construct()
     {
-        $this->template_dir = $this->getTemplateDir($template_dir);
-        $post_data = $this->getPostData();
-        $template = file_get_contents($this->template_dir . '/home.html');
-
-        return "<body>$template</body>";
+        $this->mustache = Mustache::init();
     }
 
     /**
-     * Get the Template Directory
+     * Render the template
      *
-     * @param String $template_dir
+     * @method render
      *
-     * @return String
-     * @throws \Exception
+     * @since 0.1.0
+     *
+     * @return string
      */
-    public function getTemplateDir(string $template_dir = null) : string
+    public function render() : string
     {
-        if (null !== $template_dir && is_dir($template_dir)) {
-            return $template_dir;
-        }
-        if (is_dir(get_stylesheet_directory() . '/templates')) {
-            return get_stylesheet_directory() . '/templates';
-        }
-        if (is_dir(get_template_directory() . '/templates')) {
-            return get_template_directory() . '/templates';
-        }
+        $this->template_map = $this->getTemplateMap();
+        $post_data = $this->getPostData();
+        $template = $this->getTemplate($post_data);
+        return '<body>' . $template->render($post_data) . '</body>';
+    }
 
-        throw new \Exception(__METHOD__ . ": Could not find a valid template directory");
+    /**
+     * Get Template
+     *
+     * @method getTemplate
+     *
+     * @since 0.1.0
+     *
+     * @param  object $post_data
+     *
+     * @return object
+     */
+    public function getTemplate(object $post_data) : object
+    {
+        // $slug = $this->getTemplateSlug($post_data);
+        // $template = $this->template_map[$slug];
+        return $this->mustache->loadTemplate('page');
+    }
+
+    /**
+     * Get the Templage Slug
+     *
+     * @method getTemplateSlug
+     *
+     * @since 0.1.0
+     *
+     * @param  object $post_data
+     *
+     * @return string
+     */
+    public function getTemplateSlug(object $post_data) : string
+    {
+        if (! property_exists($post_data, 'type')) {
+            return 'page';
+        }
+        if (! isset($this->template_map[$post_data->type])) {
+            return 'page';
+        }
+        return $this->template_map[$post_data->type];
+    }
+
+    /**
+     * Get the Template Map
+     *
+     * @method getTemplateMap
+     *
+     * @since 0.1.0
+     *
+     * @return array
+     */
+    public function getTemplateMap() : array
+    {
+        $default = [
+          'page'  => 'page',
+          'post'  => 'post'
+        ];
+        $filtered = apply_filters('skyforge_template_map', []);
+        $map = array_merge($default, $filtered);
+        return $map;
     }
 
     /**
      * Get Data from Rest Request based on slug
-     * Uses an internal API call
      *
-     * @return Object $data
-     * @throws \Exception
+     * @method getPostData
+     *
+     * @since 0.1.0
+     *
+     * @return object $data
      */
     public function getPostData() : object
     {
@@ -73,12 +148,17 @@ class Init
     }
 
     /**
-     * Determine which API Endpoint to use
+     * Determine which API endpoint to use
      *
-     * @param Object $post
+     * @method determineApiEndpoint
      *
-     * @return String
-     * @throws \Exception
+     * @since 0.1.0
+     *
+     * @see SkyForge\RestEndpoint
+     *
+     * @param  object $post
+     *
+     * @return string
      */
     public function determineApiEndpoint(object $post) : string
     {
@@ -89,10 +169,15 @@ class Init
     /**
      * Get a new Rest Request class
      *
-     * @param String $endpoint
+     * @method getNewRestRequest
      *
-     * @return \WP_REST_Request
-     * @throws \Exception
+     * @since 0.1.0
+     *
+     * @link https://developer.wordpress.org/reference/classes/wp_rest_request/
+     *
+     * @param  string $endpoint
+     *
+     * @return WP_REST_Request
      */
     public function getNewRestRequest(string $endpoint) : \WP_REST_Request
     {
@@ -101,12 +186,19 @@ class Init
     }
 
     /**
-     * Get Data from Rest Server
+     * Get Data from WP_REST_Server
      *
-     * @param \WP_REST_Request $request
+     * @method getDataFromRestServer
      *
-     * @return Object
-     * @throws \Exception
+     * @since 0.1.0
+     *
+     * @link https://developer.wordpress.org/reference/functions/rest_do_request/
+     * @link https://developer.wordpress.org/reference/functions/rest_get_server/
+     * @link https://developer.wordpress.org/reference/classes/wp_rest_server/response_to_data/
+     *
+     * @param  WP_REST_Request $request
+     *
+     * @return object
      */
     public function getDataFromRestServer(\WP_REST_Request $request) : object
     {

@@ -9,9 +9,13 @@ if (! defined('ABSPATH')) {
  */
 
 /**
- * Find the Composer Autoloader Path
+ * Require compose autoloader
  *
- * @return String
+ * @method skyforgeRequireComposerAutoloader
+ *
+ * @since 0.1.0
+ *
+ * @return null
  */
 function skyforgeRequireComposerAutoloader()
 {
@@ -25,12 +29,16 @@ function skyforgeRequireComposerAutoloader()
         return;
     }
 }
-// Require Composer Autoloader
 skyforgeRequireComposerAutoloader();
 
 /**
- * Enqueue Stylesheets
+ * Enqueue Static Assets
  *
+ * @method skyforgeEnqueueStylesheets
+ *
+ * @since 0.1.0
+ *
+ * @return none
  */
 function skyforgeEnqueueStylesheets()
 {
