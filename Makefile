@@ -1,11 +1,15 @@
 PHP_IMAGE	:= wpengine/php
+PHP_VERSION := 7.2
 COMPOSER_IMAGE := skypress/wp-composer
+COMPOSER_VERSION := latest
+USER_NAME := www-data
+USER_GROUP := www-data
 
 default: lint
 
 lint: lint-php
-clean: file-perms
-install: composer-install
+clean: file-perms wp-clean
+install: composer-install file-perms
 update: composer-update
 
 lint-php:
@@ -14,8 +18,8 @@ lint-php:
 		@docker run --rm \
 			--volume $(PWD):/workspace \
 			--workdir /workspace \
-			$(PHP_IMAGE):7.2 \
-				/bin/bash -c 'find . \
+			$(PHP_IMAGE):$(PHP_VERSION) \
+				/bin/bash -c 'find ./*/plugins ./*/themes \
 					-not \( -path "*/vendor" -prune \) \
 					-name \*.php \
 					-print0 | \
@@ -37,7 +41,8 @@ composer-install:
 	@docker run --rm \
 		--volume $(PWD):/app \
 		--workdir /app \
-		$(COMPOSER_IMAGE):latest composer install -o
+		$(COMPOSER_IMAGE):$(COMPOSER_VERSION) \
+			composer install -o
 	@echo
 	# Finished install packages
 
@@ -47,6 +52,7 @@ composer-update:
 	@docker run --rm \
 		--volume $(PWD):/app \
 		--workdir /app \
-		$(COMPOSER_IMAGE):latest composer update -o
+		$(COMPOSER_IMAGE):$(COMPOSER_VERSION) \
+			composer update -o
 	@echo
 	# Finished install packages
