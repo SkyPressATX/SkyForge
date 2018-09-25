@@ -2,86 +2,182 @@
 namespace SkyForge;
 
 /**
- * Init Class
+ * SkyForge Initialize Class
  *
- * @TODO Break up this big class into smaller ones
+ * @since 0.1.0
+ *
+ * @var \SkyForge\Mustache $mustache
+ * @var int $post_id
+ * @var array $template_map
  */
 class Init
 {
     /**
-     * @var $post_id
+     * Mustache Instance
+     *
+     * @since 0.1.0
+     *
+     * @var \SkyForge\Mustache
+     */
+    public $mustache;
+
+    /**
+     * Post ID
+     *
+     * @since 0.1.0
+     *
+     * @var int
      */
     public $post_id;
 
     /**
-     * Render Method
+     * Template Map
      *
-     * @return String
-     * @throws \Exception
+     * @since 0.1.0
+     *
+     * @var array
      */
-    public function render() : string
+    public $template_map;
+
+    /**
+     * Init constructor
+     *
+     * @method __construct
+     *
+     * @since 0.1.0
+     *
+     */
+    public function __construct()
     {
-        $this->post_id = $this->getPostID();
-        echo "POST ID: {$this->post_id}\n";
-        // $request_data = $this->getRequestDataFromSlug($slug);
-        // var_dump($request_data);
-        return '<h1>Hello SkyStache</h1>';
+        $this->mustache = Mustache::init();
     }
 
     /**
-     * Get Post ID
+     * Render the template
      *
-     * @see https://codex.wordpress.org/Function_Reference/url_to_postid
+     * @method render
      *
-     * @return Int
-     * @throws \Exception
+     * @since 0.1.0
+     *
+     * @return string
      */
-    public function getPostID() : int
+    public function render() : string
     {
-        global $wp;
-        $request_url = add_home(add_query_arg(array(), $wp->request));
-        $post_id = url_to_postid($request_url);
-        return $post_id;
+        $this->template_map = $this->getTemplateMap();
+        $post_data = $this->getPostData();
+        $template = $this->getTemplate($post_data);
+        return '<body>' . $template->render($post_data) . '</body>';
+    }
+
+    /**
+     * Get Template
+     *
+     * @method getTemplate
+     *
+     * @since 0.1.0
+     *
+     * @param  object $post_data
+     *
+     * @return object
+     */
+    public function getTemplate(object $post_data) : object
+    {
+        // $slug = $this->getTemplateSlug($post_data);
+        // $template = $this->template_map[$slug];
+        return $this->mustache->loadTemplate('page');
+    }
+
+    /**
+     * Get the Templage Slug
+     *
+     * @method getTemplateSlug
+     *
+     * @since 0.1.0
+     *
+     * @param  object $post_data
+     *
+     * @return string
+     */
+    public function getTemplateSlug(object $post_data) : string
+    {
+        if (! property_exists($post_data, 'type')) {
+            return 'page';
+        }
+        if (! isset($this->template_map[$post_data->type])) {
+            return 'page';
+        }
+        return $this->template_map[$post_data->type];
+    }
+
+    /**
+     * Get the Template Map
+     *
+     * @method getTemplateMap
+     *
+     * @since 0.1.0
+     *
+     * @return array
+     */
+    public function getTemplateMap() : array
+    {
+        $default = [
+          'page'  => 'page',
+          'post'  => 'post'
+        ];
+        $filtered = apply_filters('skyforge_template_map', []);
+        $map = array_merge($default, $filtered);
+        return $map;
     }
 
     /**
      * Get Data from Rest Request based on slug
-     * Uses an internal API call
      *
-     * @param String $slug
+     * @method getPostData
      *
-     * @return Object $data
-     * @throws \Exception
+     * @since 0.1.0
+     *
+     * @return object $data
      */
-    public function getRequestDataFromSlug(string $slug) : object
+    public function getPostData() : object
     {
-        $api_endpoint = $this->determineApiEndpoint($slug);
+        $post = get_post();
+        $api_endpoint = $this->determineApiEndpoint($post);
         $request      = $this->getNewRestRequest($api_endpoint);
         $data         = $this->getDataFromRestServer($request);
         return $data;
     }
 
     /**
-     * Determine which API Endpoint to use
+     * Determine which API endpoint to use
      *
-     * @param String $slug
+     * @method determineApiEndpoint
      *
-     * @return String
-     * @throws \Exception
+     * @since 0.1.0
+     *
+     * @see SkyForge\RestEndpoint
+     *
+     * @param  object $post
+     *
+     * @return string
      */
-    public function determineApiEndpoint(string $slug) : string
+    public function determineApiEndpoint(object $post) : string
     {
         $rest_endpoint = new RestEndpoint();
-        return $rest_endpoint->getEndpoint($slug);
+        return $rest_endpoint->getEndpoint($post->ID, $post->post_type);
     }
 
     /**
      * Get a new Rest Request class
      *
-     * @param String $endpoint
+     * @method getNewRestRequest
      *
-     * @return \WP_REST_Request
-     * @throws \Exception
+     * @since 0.1.0
+     *
+     * @link https://developer.wordpress.org/reference/classes/wp_rest_request/
+     *
+     * @param  string $endpoint
+     *
+     * @return WP_REST_Request
      */
     public function getNewRestRequest(string $endpoint) : \WP_REST_Request
     {
@@ -90,12 +186,19 @@ class Init
     }
 
     /**
-     * Get Data from Rest Server
+     * Get Data from WP_REST_Server
      *
-     * @param \WP_REST_Request $request
+     * @method getDataFromRestServer
      *
-     * @return Object
-     * @throws \Exception
+     * @since 0.1.0
+     *
+     * @link https://developer.wordpress.org/reference/functions/rest_do_request/
+     * @link https://developer.wordpress.org/reference/functions/rest_get_server/
+     * @link https://developer.wordpress.org/reference/classes/wp_rest_server/response_to_data/
+     *
+     * @param  WP_REST_Request $request
+     *
+     * @return object
      */
     public function getDataFromRestServer(\WP_REST_Request $request) : object
     {
