@@ -19,7 +19,7 @@ lint-php:
 			--volume $(PWD):/workspace \
 			--workdir /workspace \
 			$(PHP_IMAGE):$(PHP_VERSION) \
-				/bin/bash -c 'find ./*/plugins ./*/themes \
+				/bin/bash -c 'find . \
 					-not \( -path "*/vendor" -prune \) \
 					-name \*.php \
 					-print0 | \

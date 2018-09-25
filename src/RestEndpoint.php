@@ -1,35 +1,58 @@
 <?php
 namespace SkyForge;
 
+/**
+ * WP API Rest Endpoint
+ *
+ * @var string $api_prefix
+ * @var int $api_version
+ * @var string $api_namespace
+ * @var string $api_endpoint
+ * @var string $permalink
+ */
 class RestEndpoint
 {
     /**
-     * @var String $api_prefix
+     * WP API Prefix
+     *
+     * @var string
      */
     public $api_prefix = 'wp';
 
     /**
-     * @var String $api_version
+     * WP API Version
+     *
+     * @var int
      */
-    public $api_version = '2';
+    public $api_version = 2;
 
     /**
-     * @var String $api_namespace
+     * WP API Namespace
+     *
+     * @var string
      */
     public $api_namespace;
 
     /**
-     * @var String $api_endpoint
+     * WP API Endpoint
+     *
+     * @var string
      */
     public $api_endpoint;
 
     /**
-     * @var String $permalink
+     * WP Permalink rule
+     *
+     * @var string
      */
     public $permalink;
 
     /**
-     * Constructor
+     * Class Constructor
+     *
+     * @method __construct
+     *
+     * @since 0.1.0
      */
     public function __construct()
     {
@@ -38,13 +61,16 @@ class RestEndpoint
     }
 
     /**
-     * Get and Endpoint based on provided slug
+     * Get the proper Endpoint
      *
-     * @param Int $id
-     * @param String $type
+     * @method getEndpoint
      *
-     * @return String
-     * @throws \Exception
+     * @since 0.1.0
+     *
+     * @param  int $id
+     * @param  string $type
+     *
+     * @return string
      */
     public function getEndpoint(int $id = null, string $type) : string
     {
@@ -58,15 +84,27 @@ class RestEndpoint
     }
 
     /**
-     * Get Rest API Base slug
+     * Get the WP API Base
      *
-     * @param String $type
+     * @method getRestBase
      *
-     * @return String
+     * @since 0.1.0
+     *
+     * @link https://codex.wordpress.org/Function_Reference/get_post_type_object
+     *
+     * @param  string $type
+     *
+     * @return string
      */
     public function getRestBase(string $type) : string
     {
         $type_object = get_post_type_object($type);
-        return (empty((array)$type_object) || ! property_exists($type_object, 'rest_base')) ? $type : strtolower($type_object->rest_base);
+        if (null === $type_object || empty($type_object) || ! is_object($type_object)) {
+            return strtolower($type);
+        }
+        if (! property_exists($type_object, 'rest_base') || empty($type_object->rest_base)) {
+            return strtolower($type);
+        }
+        return strtolower($type_object->rest_base);
     }
 }

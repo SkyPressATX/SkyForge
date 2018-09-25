@@ -8,7 +8,6 @@ namespace SkyForge;
  *
  * @var \SkyForge\Mustache $mustache
  * @var int $post_id
- * @var array $template_map
  */
 class Init
 {
@@ -29,15 +28,6 @@ class Init
      * @var int
      */
     public $post_id;
-
-    /**
-     * Template Map
-     *
-     * @since 0.1.0
-     *
-     * @var array
-     */
-    public $template_map;
 
     /**
      * Init constructor
@@ -64,69 +54,30 @@ class Init
     public function render() : string
     {
         $this->template_map = $this->getTemplateMap();
-        $post_data = $this->getPostData();
-        $template = $this->getTemplate($post_data);
-        return '<body>' . $template->render($post_data) . '</body>';
+        $data = [
+            'header'  => $this->getHeaderData(),
+            'body'    => $this->getPostData(),
+            'footer'  => []
+        ];
+        $html = $this->mustache->loadTemplate('header')->render($data['header']);
+        $html .= $this->mustache->loadTemplate('body')->render($data['body']);
+        $html .= $this->mustache->loadTemplate('footer')->render($data['footer']);
+        return $html;
     }
 
     /**
-     * Get Template
+     * Get Header Data
      *
-     * @method getTemplate
-     *
-     * @since 0.1.0
-     *
-     * @param  object $post_data
-     *
-     * @return object
-     */
-    public function getTemplate(object $post_data) : object
-    {
-        // $slug = $this->getTemplateSlug($post_data);
-        // $template = $this->template_map[$slug];
-        return $this->mustache->loadTemplate('page');
-    }
-
-    /**
-     * Get the Templage Slug
-     *
-     * @method getTemplateSlug
-     *
-     * @since 0.1.0
-     *
-     * @param  object $post_data
-     *
-     * @return string
-     */
-    public function getTemplateSlug(object $post_data) : string
-    {
-        if (! property_exists($post_data, 'type')) {
-            return 'page';
-        }
-        if (! isset($this->template_map[$post_data->type])) {
-            return 'page';
-        }
-        return $this->template_map[$post_data->type];
-    }
-
-    /**
-     * Get the Template Map
-     *
-     * @method getTemplateMap
+     * @method getHeaderData
      *
      * @since 0.1.0
      *
      * @return array
      */
-    public function getTemplateMap() : array
+    public function getHeaderData() : array
     {
-        $default = [
-          'page'  => 'page',
-          'post'  => 'post'
-        ];
-        $filtered = apply_filters('skyforge_template_map', []);
-        $map = array_merge($default, $filtered);
-        return $map;
+        $header = new Header();
+        return $header->getData();
     }
 
     /**
