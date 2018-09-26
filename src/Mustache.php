@@ -153,7 +153,7 @@ class Mustache
           'extension' => $this->applySkyForgeConfigFilter($this->extension_filter_slug, '.html')
         ];
         if (null === $path) {
-            return $this->createMustacheCascadingLoader($path, $options);
+            return $this->createMustacheCascadingLoader($options);
         }
 
         return new \Mustache_Loader_FilesystemLoader($path, $options);
@@ -169,12 +169,11 @@ class Mustache
      * @link https://github.com/bobthecow/mustache.php/wiki/Template-Loading#cascading-loader
      * @link https://github.com/bobthecow/mustache.php/wiki/Template-Loading#filesystem-loader
      *
-     * @param  string $path
      * @param  array $options
      *
      * @return Mustache_Loader_CascadingLoader
      */
-    public function createMustacheCascadingLoader(string $path, array $options) : \Mustache_Loader_CascadingLoader
+    public function createMustacheCascadingLoader(array $options) : \Mustache_Loader_CascadingLoader
     {
         $paths = [
             new \Mustache_Loader_FilesystemLoader(get_stylesheet_directory() . '/templates', $options),
