@@ -61,56 +61,12 @@ class Init
      */
     public function render() : string
     {
-        $data = [
-            'header'  => $this->getHeaderData(),
-            'body'    => $this->getPostData(),
-            'footer'  => $this->getFooterData()
-        ];
+        $data = $this->getPostData();
         if (empty($this->template_type)) {
             $this->template_type = 'page'; // Default to page
         }
-        $html = $this->mustache->loadTemplate('header')->render($data['header']);
-        $html .= $this->mustache->loadTemplate($this->template_type)->render($data['body']);
-        $html .= $this->mustache->loadTemplate('footer')->render($data['footer']);
+        $html = $this->mustache->loadTemplate($this->template_type)->render($data);
         return $html;
-    }
-
-    /**
-     * Get Header Data
-     *
-     * @method getHeaderData
-     *
-     * @since 0.1.0
-     *
-     * @return array
-     */
-    public function getHeaderData() : array
-    {
-        $header = new Header();
-        return $header->getData();
-    }
-
-    /**
-     * Get Footer Data
-     *
-     * @method getFooterData
-     *
-     * @since 0.1.0
-     *
-     * @link http://php.net/manual/en/function.ob-get-contents.php
-     * @link https://codex.wordpress.org/Function_Reference/wp_footer
-     *
-     * @return array
-     */
-    public function getFooterData() : array
-    {
-        ob_start();
-        wp_footer();
-        $html = ob_get_contents();
-        ob_end_clean();
-        return [
-            'wp_footer' => $html
-        ];
     }
 
     /**

@@ -1,7 +1,7 @@
  <!doctype html>
  <html <?php language_attributes(); ?> >
  <head>
-   <meta charset="<?php bloginfo('charset'); ?>" />
+   <meta charset="<?php get_bloginfo('charset'); ?>" />
    <title><?php get_bloginfo('name'); ?></title>
    <base href="/">
 
