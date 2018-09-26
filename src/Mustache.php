@@ -145,9 +145,9 @@ class Mustache
      *
      * @param  string $path
      *
-     * @return Mustache_Loader_FilesystemLoader
+     * @return mixed
      */
-    public function createNewMustacheLoader(string $path = null) : \Mustache_Loader_FilesystemLoader
+    public function createNewMustacheLoader(string $path = null)
     {
         $options = [
           'extension' => $this->applySkyForgeConfigFilter($this->extension_filter_slug, '.html')
