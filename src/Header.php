@@ -74,7 +74,7 @@ class Header
      * @since 0.1.0
      *
      * @link https://developer.wordpress.org/reference/functions/get_language_attributes/
-     * @link https://developer.wordpress.org/reference/functions/bloginfo/
+     * @link https://developer.wordpress.org/reference/functions/get_bloginfo/
      * @link https://developer.wordpress.org/reference/functions/get_body_class/
      *
      * @return array
@@ -82,9 +82,14 @@ class Header
     public function getDefaultHeaderData() : array
     {
         $data = [
-            'language_attributes' => get_language_attributes(),
-            'blog_info'           => bloginfo(),
-            'body_class'          => get_body_class()
+            'body_class'            => implode(' ', get_body_class()),
+            'language_attributes'   => get_language_attributes(),
+            'charset'               => get_bloginfo('charset'),
+            'name'                  => get_bloginfo('name'),
+            'description'           => get_bloginfo('description'),
+            'wp_head'               => function () {
+                wp_head();
+            }
         ];
         return $data;
     }

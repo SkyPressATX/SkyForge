@@ -64,7 +64,9 @@ class Init
         $data = [
             'header'  => $this->getHeaderData(),
             'body'    => $this->getPostData(),
-            'footer'  => []
+            'footer'  => [ 'wp_footer' => function () {
+                wp_footer();
+            }]
         ];
         if (empty($this->template_type)) {
             $this->template_type = 'page'; // Default to page
