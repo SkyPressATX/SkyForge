@@ -65,7 +65,7 @@ class Init
             'header'  => $this->getHeaderData(),
             'body'    => $this->getPostData(),
             'footer'  => [ 'wp_footer' => function () {
-                wp_footer();
+                call_user_func('wp_footer');
             }]
         ];
         if (empty($this->template_type)) {

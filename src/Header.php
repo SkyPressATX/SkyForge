@@ -88,7 +88,7 @@ class Header
             'name'                  => get_bloginfo('name'),
             'description'           => get_bloginfo('description'),
             'wp_head'               => function () {
-                wp_head();
+                call_user_func('wp_header');
             }
         ];
         return $data;
