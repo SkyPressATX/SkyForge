@@ -3,10 +3,10 @@ try {
     if (! class_exists('SkyForge\\Init')) {
         throw new Exception('SkyForge failed to load');
     }
-    wp_header();
+    get_header();
     $skyforge = new \SkyForge\Init;
     echo $skyforge->render();
-    wp_footer();
+    get_footer();
 } catch (Exception $e) {
     echo "<h4>Error: {$e->getMessage()}</h4>";
 }
