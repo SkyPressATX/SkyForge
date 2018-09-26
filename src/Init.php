@@ -8,6 +8,7 @@ namespace SkyForge;
  *
  * @var \SkyForge\Mustache $mustache
  * @var int $post_id
+ * @var string $template_type
  */
 class Init
 {
@@ -28,6 +29,13 @@ class Init
      * @var int
      */
     public $post_id;
+
+    /**
+     * Template Type
+     *
+     * @var string
+     */
+    public $template_type;
 
     /**
      * Init constructor
@@ -53,14 +61,16 @@ class Init
      */
     public function render() : string
     {
-        $this->template_map = $this->getTemplateMap();
         $data = [
             'header'  => $this->getHeaderData(),
             'body'    => $this->getPostData(),
             'footer'  => []
         ];
+        if (empty($this->template_type)) {
+            $this->template_type = 'page'; // Default to page
+        }
         $html = $this->mustache->loadTemplate('header')->render($data['header']);
-        $html .= $this->mustache->loadTemplate('body')->render($data['body']);
+        $html .= $this->mustache->loadTemplate($this->template_type)->render($data['body']);
         $html .= $this->mustache->loadTemplate('footer')->render($data['footer']);
         return $html;
     }
@@ -92,9 +102,10 @@ class Init
     public function getPostData() : object
     {
         $post = get_post();
-        $api_endpoint = $this->determineApiEndpoint($post);
-        $request      = $this->getNewRestRequest($api_endpoint);
-        $data         = $this->getDataFromRestServer($request);
+        $this->template_type    = strtolower($post->post_type);
+        $api_endpoint           = $this->determineApiEndpoint($post->ID, $post->post_type);
+        $request                = $this->getNewRestRequest($api_endpoint);
+        $data                   = $this->getDataFromRestServer($request);
         return $data;
     }
 
@@ -107,14 +118,15 @@ class Init
      *
      * @see SkyForge\RestEndpoint
      *
-     * @param  object $post
+     * @param  int $id
+     * @param  string $type
      *
      * @return string
      */
-    public function determineApiEndpoint(object $post) : string
+    public function determineApiEndpoint(int $id, string $type) : string
     {
         $rest_endpoint = new RestEndpoint();
-        return $rest_endpoint->getEndpoint($post->ID, $post->post_type);
+        return $rest_endpoint->getEndpoint($id, $type);
     }
 
     /**

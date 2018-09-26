@@ -9,7 +9,6 @@ namespace SkyForge;
  *
  * @var string $cache_filter_slug
  * @var string $path_filter_slug
- * @var string $partials_path_filter_slug
  * @var string $extension_filter_slug
  * @var string $pragmas_filter_slug
  * @var Mustache_Engine $mustache
@@ -31,13 +30,6 @@ class Mustache
      * @var string
      */
     public $path_filter_slug = 'skyforge_template_path';
-
-    /**
-     * Partials Template path filter slug
-     *
-     * @var string
-     */
-    public $partials_path_filter_slug = 'skyforge_partials_path';
 
     /**
      * Mustache Pramas filter slug
@@ -135,12 +127,10 @@ class Mustache
         $config = [
           'pragmas'     => $this->applySkyForgeConfigFilter($this->pragmas_filter_slug, $default['pragmas']),
           'cache'       => $this->applySkyForgeConfigFilter($this->cache_filter_slug, $default['cache']),
-          'loader'      => $this->applySkyForgeConfigFilter($this->path_filter_slug, $default['loader']),
-          'partials'    => $this->applySkyForgeConfigFilter($this->$partials_path_filter_slug, $default['partials'])
+          'loader'      => $this->applySkyForgeConfigFilter($this->path_filter_slug, null)
         ];
 
         $config['loader']   = $this->createNewMustacheLoader($config['loader']);
-        $config['partials'] = $this->createNewMustacheLoader($config['partials']);
         return $config;
     }
 
@@ -151,20 +141,46 @@ class Mustache
      *
      * @since 0.1.0
      *
-     * @link https://github.com/bobthecow/mustache.php/wiki/Template-Loading
+     * @link https://github.com/bobthecow/mustache.php/wiki/Template-Loading#filesystem-loader
      *
      * @param  string $path
      *
      * @return Mustache_Loader_FilesystemLoader
      */
-    public function createNewMustacheLoader(string $path) : \Mustache_Loader_FilesystemLoader
+    public function createNewMustacheLoader(string $path = null) : \Mustache_Loader_FilesystemLoader
     {
         $options = [
           'extension' => $this->applySkyForgeConfigFilter($this->extension_filter_slug, '.html')
         ];
-        $loader = new \Mustache_Loader_FilesystemLoader($path, $options);
+        if( null === $path ){
+            return $this->createMustacheCascadingLoader($path, $options);
+        }
 
-        return $loader;
+        return new \Mustache_Loader_FilesystemLoader($path, $options);
+    }
+
+    /**
+     * Create Mustache Cascading Loader
+     *
+     * @method createMustacheCascadingLoader
+     *
+     * @since 0.1.0
+     *
+     * @link https://github.com/bobthecow/mustache.php/wiki/Template-Loading#cascading-loader
+     * @link https://github.com/bobthecow/mustache.php/wiki/Template-Loading#filesystem-loader
+     *
+     * @param  string $path
+     * @param  array $options
+     *
+     * @return Mustache_Loader_CascadingLoader
+     */
+    public function createMustacheCascadingLoader(string $path, array $options ) : \Mustache_Loader_CascadingLoader
+    {
+        $paths = [
+            new \Mustache_Loader_FilesystemLoader(get_stylesheet_directory() . '/templates'), $options),
+            new \Mustache_Loader_FilesystemLoader(get_template_directory() . '/templates'), $options)
+        ];
+        return new \Mustache_Loader_CascadingLoader($paths);
     }
 
     /**
@@ -174,7 +190,7 @@ class Mustache
      *
      * @since 0.1.0
      *
-     * @link https://github.com/bobthecow/mustache.php/wiki/BLOCKS-pragma
+     * @link https://github.com/bobthecow/mustache.php/wiki/Pragmas
      * @link https://github.com/khromov/mustache-wordpress-cache
      *
      * @return array
@@ -183,9 +199,7 @@ class Mustache
     {
         $defaults = [
             'pragmas'     => [],
-            'cache'       => new \Khromov\Mustache_Cache\Mustache_Cache_WordPressCache,
-            'loader'      => $this->getDefaultLoaderPath(),
-            'partials'    => $this->getDefaultPartialsPath()
+            'cache'       => new \Khromov\Mustache_Cache\Mustache_Cache_WordPressCache
         ];
 
         return $defaults;
@@ -207,47 +221,5 @@ class Mustache
     {
         $filtered = apply_filters($filter, $default);
         return $filtered;
-    }
-
-    /**
-     * Get default loader path
-     *
-     * @method getDefaultLoaderPath
-     *
-     * @since 0.1.0
-     *
-     * @return string
-     */
-    public function getDefaultLoaderPath() : string
-    {
-        if (file_exists(get_stylesheet_directory() . '/templates/index.html')) {
-            return get_stylesheet_directory() . '/templates';
-        }
-        if (file_exists(get_template_directory() . '/templates/index.html')) {
-            return get_template_directory() . '/templates';
-        }
-
-        return get_stylesheet_directory();
-    }
-
-    /**
-     * Get default partials path
-     *
-     * @method getDefaultPartialsPath
-     *
-     * @since 0.1.0
-     *
-     * @return string
-     */
-    public function getDefaultPartialsPath() : string
-    {
-        if (is_dir(get_stylesheet_directory() . '/templates')) {
-            return get_stylesheet_directory() . '/templates';
-        }
-        if (is_dir(get_template_directory() . '/templates')) {
-            return get_template_directory() . '/templates';
-        }
-
-        return get_stylesheet_directory();
     }
 }
