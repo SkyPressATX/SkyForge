@@ -87,10 +87,28 @@ class Header
             'charset'               => get_bloginfo('charset'),
             'name'                  => get_bloginfo('name'),
             'description'           => get_bloginfo('description'),
-            'wp_head'               => function () {
-                call_user_func('wp_head');
-            }
+            'wp_head'               => $this->getWPHeadHTML()
         ];
         return $data;
+    }
+
+    /**
+     * Get wp_head HTML
+     *
+     * @method getWPHeadHTML
+     *
+     * @since 0.1.0
+     *
+     * @link http://php.net/manual/en/function.ob-get-contents.php
+     * @link https://codex.wordpress.org/Function_Reference/wp_head
+     *
+     * @return string
+     */
+    public function getWPHeadHTML() : string
+    {
+        ob_start();
+        $html = ob_get_contents();
+        ob_end_clean();
+        return $html;
     }
 }

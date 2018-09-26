@@ -64,9 +64,7 @@ class Init
         $data = [
             'header'  => $this->getHeaderData(),
             'body'    => $this->getPostData(),
-            'footer'  => [ 'wp_footer' => function () {
-                call_user_func('wp_footer');
-            }]
+            'footer'  => $this->getFooterData()
         ];
         if (empty($this->template_type)) {
             $this->template_type = 'page'; // Default to page
@@ -90,6 +88,29 @@ class Init
     {
         $header = new Header();
         return $header->getData();
+    }
+
+    /**
+     * Get Footer Data
+     *
+     * @method getFooterData
+     *
+     * @since 0.1.0
+     *
+     * @link http://php.net/manual/en/function.ob-get-contents.php
+     * @link https://codex.wordpress.org/Function_Reference/wp_footer
+     *
+     * @return array
+     */
+    public function getFooterData() : array
+    {
+        ob_start();
+        wp_footer();
+        $html = ob_get_contents();
+        ob_end_clean();
+        return [
+            'wp_footer' => $html
+        ];
     }
 
     /**
