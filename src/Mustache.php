@@ -152,7 +152,7 @@ class Mustache
         $options = [
           'extension' => $this->applySkyForgeConfigFilter($this->extension_filter_slug, '.html')
         ];
-        if( null === $path ){
+        if (null === $path) {
             return $this->createMustacheCascadingLoader($path, $options);
         }
 
@@ -174,11 +174,11 @@ class Mustache
      *
      * @return Mustache_Loader_CascadingLoader
      */
-    public function createMustacheCascadingLoader(string $path, array $options ) : \Mustache_Loader_CascadingLoader
+    public function createMustacheCascadingLoader(string $path, array $options) : \Mustache_Loader_CascadingLoader
     {
         $paths = [
-            new \Mustache_Loader_FilesystemLoader(get_stylesheet_directory() . '/templates'), $options),
-            new \Mustache_Loader_FilesystemLoader(get_template_directory() . '/templates'), $options)
+            new \Mustache_Loader_FilesystemLoader(get_stylesheet_directory() . '/templates', $options),
+            new \Mustache_Loader_FilesystemLoader(get_template_directory() . '/templates', $options)
         ];
         return new \Mustache_Loader_CascadingLoader($paths);
     }
