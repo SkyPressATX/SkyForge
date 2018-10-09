@@ -6,7 +6,6 @@ namespace SkyForge;
  *
  * @since 0.1.0
  *
- * @var \SkyForge\Mustache $mustache
  * @var int $post_id
  * @var string $template_type
  * @var string $data_filter
@@ -15,15 +14,6 @@ namespace SkyForge;
  */
 class Init
 {
-    /**
-     * Mustache Instance
-     *
-     * @since 0.1.0
-     *
-     * @var \SkyForge\Mustache
-     */
-    public $mustache;
-
     /**
      * Post ID
      *
@@ -69,61 +59,24 @@ class Init
     public $nav_slug_default = 'main';
 
     /**
-     * Init constructor
-     *
-     * @method __construct
-     *
-     * @since 0.1.0
-     *
-     */
-    public function __construct()
-    {
-        $this->mustache = Mustache::init();
-    }
-
-    /**
      * Render the template
      *
      * @method render
      *
      * @since 0.1.0
      *
+     * @link https://developer.wordpress.org/reference/functions/get_post/
+     * @uses \SkyForge\Context
+     * @uses \SkyForge\Render
+     *
      * @return string
      */
     public function render() : string
     {
-        $data   = $this->getRenderData();
-        $render = [
-            'header'                => $this->getHeaderData(),
-            $this->template_type    => $this->getRenderData()
-        ];
-        $filtered_data = apply_filters($this->data_filter, $render);
-        // print_r($filtered_data['nav']);
-        return $this->mustache->loadTemplate($this->template_type)->render($filtered_data);
-    }
+        $post       = get_post();
+        $context    = call_user_func_array([new Context,'getContext'], [$post]);
 
-    public function getHeaderData()
-    {
-        $data = [
-            'title' => get_bloginfo('name'),
-            'nav'   => $this->getNavData()
-        ];
-        return $data;
-    }
-
-    /**
-     * Get Navigation Data
-     *
-     * @method getNavData
-     *
-     * @since 0.1.0
-     *
-     * @return mixed object | bool
-     */
-    public function getNavData()
-    {
-        $nav_slug = apply_filters($this->nav_slug_filter, $this->nav_slug_default);
-        return wp_get_nav_menu_items($nav_slug);
+        return call_user_func_array([new Render,'render'], [$post->post_type, $context]);
     }
 
     /**
