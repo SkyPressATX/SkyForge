@@ -1,0 +1,19 @@
+{
+  "name": "@skypress/skyforge",
+  "version": "1.0.0",
+  "description": "SkyPress Template based WordPress Theme",
+  "main": "index.js",
+  "scripts": {
+    "zip": "git archive -o skyforge.zip --prefix=skyforge/ HEAD"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SkyPressATX/SkyForge.git"
+  },
+  "author": "SkyPress",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SkyPressATX/SkyForge/issues"
+  },
+  "homepage": "https://github.com/SkyPressATX/SkyForge#readme"
+}

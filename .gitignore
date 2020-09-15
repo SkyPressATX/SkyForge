@@ -1,3 +1,5 @@
 ## Ignore from Git
 /vendor
 /logs 
+/node_modules
+**/*.zip
